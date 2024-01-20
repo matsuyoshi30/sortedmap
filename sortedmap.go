@@ -84,7 +84,7 @@ func (sm *SortedMap[K, V]) insert(key K) {
 		sm.first = &key
 	}
 	if sm.last == nil || *sm.last < key {
-		sm.last = &key
+		sm.last = &key // TODO: last = key + 1
 	}
 }
 
@@ -167,5 +167,5 @@ func (sm *SortedMap[K, V]) TailMap(from K) *SortedMap[K, V] {
 }
 
 func (sm *SortedMap[K, V]) IsEmpty() bool {
-	return sm.kv.len() == 0
+	return sm.kv.len() == 0 || *sm.last <= *sm.first
 }
