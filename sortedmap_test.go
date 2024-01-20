@@ -411,3 +411,38 @@ func TestSortedMap_TailMap(t *testing.T) {
 		})
 	}
 }
+
+func TestSortedMap_IsEmpty(t *testing.T) {
+	tests := []struct {
+		desc string
+		vals []string
+		want bool
+	}{
+		{
+			desc: "empty",
+			want: true,
+		},
+		{
+			desc: "single value",
+			vals: []string{"foo"},
+			want: false,
+		},
+		{
+			desc: "multiple values",
+			vals: []string{"foo", "bar", "baz"},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			sm := sortedmap.NewSortedMap[int, string]()
+			for i, val := range tt.vals {
+				sm.Put(i+1, val)
+			}
+			got := sm.IsEmpty()
+			if tt.want != got {
+				t.Fatalf("want %v but got %v\n", tt.want, got)
+			}
+		})
+	}
+}

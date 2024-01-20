@@ -33,6 +33,10 @@ func (m *m[K, V]) d(key K) {
 	delete(m.kv, key)
 }
 
+func (m *m[K, V]) len() int {
+	return len(m.kv)
+}
+
 func NewSortedMap[K cmp.Ordered, V any]() *SortedMap[K, V] {
 	sl := make([]K, 0)
 	return &SortedMap[K, V]{kv: newM[K, V](), sl: &sl}
@@ -160,4 +164,8 @@ func (sm *SortedMap[K, V]) TailMap(from K) *SortedMap[K, V] {
 	sm2.first = &from
 
 	return sm2
+}
+
+func (sm *SortedMap[K, V]) IsEmpty() bool {
+	return sm.kv.len() == 0
 }
