@@ -46,7 +46,7 @@ func (sm *SortedMap[K, V]) checkRange(key K) bool {
 	if sm.first != nil && key < *sm.first {
 		return false
 	}
-	if sm.last != nil && *sm.last < key { // TODO: exclude last
+	if sm.last != nil && *sm.last <= key {
 		return false
 	}
 
@@ -80,12 +80,6 @@ func (sm *SortedMap[K, V]) insert(key K) {
 		return
 	}
 	*sm.sl = slices.Insert(*sm.sl, i, key)
-	if sm.first == nil || key < *sm.first {
-		sm.first = &key
-	}
-	if sm.last == nil || *sm.last < key {
-		sm.last = &key // TODO: last = key + 1
-	}
 }
 
 func (sm *SortedMap[K, V]) Remove(key K) V {
@@ -111,25 +105,36 @@ func (sm *SortedMap[K, V]) delete(key K) {
 
 func (sm *SortedMap[K, V]) FirstKey() (K, bool) {
 	if sm.first == nil {
-		var ret K
-		return ret, false
+		sl := *sm.sl
+		if len(sl) == 0 {
+			var ret K
+			return ret, false
+		}
+		return sl[0], true
 	}
 	return *sm.first, true
 }
 
 func (sm *SortedMap[K, V]) LastKey() (K, bool) {
 	if sm.last == nil {
-		var ret K
-		return ret, false
+		sl := *sm.sl
+		if len(sl) == 0 {
+			var ret K
+			return ret, false
+		}
+		return sl[len(sl)-1], true
 	}
 	return *sm.last, true
 }
 
 func (sm *SortedMap[K, V]) SubMap(from, to K) *SortedMap[K, V] {
-	if sm.first == nil || from < *sm.first {
+	if sm.IsEmpty() {
 		return nil
 	}
-	if sm.last == nil || *sm.last < to {
+	if sm.first != nil && from < *sm.first {
+		return nil
+	}
+	if sm.last != nil && *sm.last < to {
 		return nil
 	}
 
@@ -142,7 +147,10 @@ func (sm *SortedMap[K, V]) SubMap(from, to K) *SortedMap[K, V] {
 }
 
 func (sm *SortedMap[K, V]) HeadMap(to K) *SortedMap[K, V] {
-	if sm.first == nil || to < *sm.first {
+	if sm.IsEmpty() {
+		return nil
+	}
+	if sm.first != nil && to < *sm.first {
 		return nil
 	}
 
@@ -154,7 +162,10 @@ func (sm *SortedMap[K, V]) HeadMap(to K) *SortedMap[K, V] {
 }
 
 func (sm *SortedMap[K, V]) TailMap(from K) *SortedMap[K, V] {
-	if sm.last == nil || *sm.last < from {
+	if sm.IsEmpty() {
+		return nil
+	}
+	if sm.last != nil && *sm.last < from {
 		return nil
 	}
 
@@ -167,5 +178,5 @@ func (sm *SortedMap[K, V]) TailMap(from K) *SortedMap[K, V] {
 }
 
 func (sm *SortedMap[K, V]) IsEmpty() bool {
-	return sm.kv.len() == 0 || *sm.last <= *sm.first
+	return sm.kv.len() == 0 || (sm.last != nil && sm.first != nil && *sm.last <= *sm.first)
 }

@@ -422,11 +422,11 @@ func TestSortedMap_IsEmpty(t *testing.T) {
 			desc: "empty",
 			want: true,
 		},
-		// {
-		// 	desc: "single value",
-		// 	vals: []string{"foo"},
-		// 	want: false,
-		// },
+		{
+			desc: "single value",
+			vals: []string{"foo"},
+			want: false,
+		},
 		{
 			desc: "multiple values",
 			vals: []string{"foo", "bar", "baz"},
